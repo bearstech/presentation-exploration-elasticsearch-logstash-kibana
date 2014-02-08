@@ -1,0 +1,10 @@
+{
+    "title": "Exploration avec Elasticsearch",
+    "theme": "memories",
+    "duration": 20,
+    "sections": {
+        "main": "",
+        "autopsie": "Autopsie HTTP",
+        "ssh_failed": "La chasse aux pénibles sur SSH"
+    }
+}
