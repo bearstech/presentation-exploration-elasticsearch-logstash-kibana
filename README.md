@@ -3,7 +3,9 @@ Exploration avec Elasticsearch, Logstash et Kibana
 
 Présentation de la stack ELK pour déboguer ou analyser des services.
 
-La présentation utilise slide-em-up.
+La présentation utilise [slide-em-up](https://github.com/nono/slide-em-up).
+
+Le résultat est disponible sur la page github de [Exploration avec Elasticsearch, Logstash et Kibana](http://bearstech.github.io/presentation-exploration-elasticsearch-logstash-kibana/#slide1).
 
 Présentation
 ------------
