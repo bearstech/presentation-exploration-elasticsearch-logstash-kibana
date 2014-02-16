@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <title>Exploration avec Elasticsearch</title>
+      <link rel="stylesheet" href="css/fonts.css">
+      <link rel="stylesheet" href="css/slideshow.css">
+      <link rel="stylesheet" href="css/theme.css">
+      <link rel="stylesheet" href="toto.css">
+    <link rel="stylesheet" href="css/pygments/solarized.css">
+    <script src="js/prefixfree.min.js"></script>
+  </head>
+  <body data-duration="20">
+    <section>
+      <header class="slide">
+        <h1>Exploration avec Elasticsearch</h1>
+        <h2></h2>
+      </header>
+    </section>
+      <section>
+        <header class="slide">
+          <h1></h1>
+        </header>
+          <section class="slide # La triplette Elasticsearch-Logstash-Kibana">
+            
+          </section>
+          <section class="slide ">
+            <h2>ES n'est pas un moteur de recherche</h2>
+
+<p>C'est <em>aussi</em> un moteur de recherche.</p>
+
+<p>Elasticsearch est une base clef/valeur, distribuée, avec une interface REST et des index efficaces.</p>
+
+<p>ElasticSearch stocke des réponses qu'il construit, et les assemble au dernier moment.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>Logstash traduit le blougui blouga des logs</h2>
+
+<p>Déjà vu. Tout le monde l'a déjà fait avec des scripts maison, pour un résultat aléatoire.</p>
+
+<p>Logstash a quelques armes secrètes : la lecture des dates, des expressions régulières lisibles, de la résolution IP, du parsing de user-agent et des threads qui fonctionnent.</p>
+
+<p>Attention, il peut lire à peu n'importe quoi et écrire dans encore plus de formats.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>Kibana est un joli tableau de bord</h2>
+
+<p>Kibana a enlevé tout ce qui ne servait à rien : le serveur, pour se brancher directement sur Elasticsearch. Tout en JavaScript, Angular assure la modularité, Flot les graphiques.</p>
+
+<p>Kibana utilise un format simplissime qui permet de le nourrir un peu comme on veut.</p>
+
+<p>L'interface permet d'explorer les données, puis de proposer des tableaux de bords.</p>
+
+          </section>
+      </section>
+      <section>
+        <header class="slide">
+          <h1>Autopsie HTTP</h1>
+        </header>
+          <section class="slide ">
+            <h1>Comprendre le cheminement d'HTTP</h1>
+
+          </section>
+          <section class="slide ">
+            <h2>HTTP</h2>
+
+<p>HTTP est un format bien normalisé, orienté texte (avant sa version 2.0).</p>
+
+<p>HTTP est prévu pour être empilé, les proxys  font parti de l'écosystème. </p>
+
+<p>HTTP est partout, et dans REST en particulier.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>Visualiser et comprendre</h2>
+
+<p>Vérifier que le routage se passe comme prévu.</p>
+
+<p>Ça plante, mais qui est le responsable?</p>
+
+<p>Cette application utilise des webservices, c'est peut-être la cause de ses ralentissements?</p>
+
+          </section>
+          <section class="slide ">
+            <h2>Empiler les proxys</h2>
+
+<p>Du cache avec Varnish.</p>
+
+<p>De la haute disponibilité avec HAproxy.</p>
+
+<p>Le classique serveur web avec Nginx ou Apache qui effectue une partie du routage.</p>
+
+<p>Le serveur d'application, tout au fond.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>Journeaux applicatif</h2>
+
+<p>Des logs, quoi.</p>
+
+<p>Pratique, mais on est dans le monde du chacun pour soi, chacun s'occupe de leur tranche, pas du gâteau en entier.</p>
+
+<p>Les logs peuvent facilement être verbeux, ou simplement ennuyeux.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>PCAP</h2>
+
+<p>PCAP est l'extraction de la partie extraction de paquets de <em>tcpdump</em>.</p>
+
+<p>PCAP est partout, dans Wireshark et tous ses clones (tcpflow, Justniffer…).</p>
+
+<p>PCAP permet de surveiller sans modifier, mais PCAP peut perdre des paquets.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>dpkt et pypcap</h2>
+
+<p>Python est beaucoup utilisé par les gens qui veulent savoir ce qui passe dans le tuyau (pour ensuite y pousser des choses bizarres, pour voir ce que ça fait).</p>
+
+<p>Scapy est l'outil de référence pour analyser et forger.</p>
+
+<p>Là, on veut juste regarder de l'HTTP : pypcap pour attraper les trames réseaux, dpkt pour reconstruire la couche protocole.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>Filtrer le flot d'information</h2>
+
+<p>Autopsie se contente de filtrer le minimum d'informations (via les filtres de pcap), puis au niveau du protocole.</p>
+
+<p>En live, ou depuis un snapshot au format de tcpdump.</p>
+
+<p>Il rassemble chaque requête et avec sa réponse, en mesurant des choses.</p>
+
+<p>Ces informations sont ensuite confiées à un autre outil : Kibana.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>Logstash</h2>
+
+<p>Autopsie parle directement à Logstash, via son protocole tout simple, en TCP.</p>
+
+<p>Logstash peut en plus enrichir les informations (user agent, geoip…) et il se charge de transférer les données dans Elasticsearch, indispensable pour visualiser avec Kibana.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>Kibana</h2>
+
+<p>Kibana est parfait pour filtrer et chercher les pires scores.</p>
+
+<p>Attention aux calculs de statistiques, on sort alors de la zone de confort.</p>
+
+<p>Il va falloir attendre l'arrivée des quantiles avec des noms qui font rêver : frugal, qdigest, tdigest.</p>
+
+          </section>
+      </section>
+      <section>
+        <header class="slide">
+          <h1>La chasse aux pénibles sur SSH</h1>
+        </header>
+          <section class="slide # Analyse de journaux perdus au fond de syslog">
+            
+          </section>
+          <section class="slide ">
+            <p>Les serveurs loguent plein de choses qui pourront avoir une utilité, plus tard.</p>
+
+<p>Ces informations, en tant que tel ont peu de sens, et donc peu d'utilités. Elles construisent par contre une histoire, qui elle, est intéressante.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>Le problème</h2>
+
+<p>De manière systématique et aveugle, des pénibles vont essayer de se loguer en SSH sur vos machines. SSH empêche les attaques par dictionnaire, en imposant un laps de temps entre chaque tentative.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>Syslog</h2>
+
+<p>UNIX propose depuis des temps immémoriaux de centraliser et de router des logs avec Syslog.</p>
+
+<p>L'outil n'est pas parfait, mais il permet simplement de router tout ce qui touche à l'authentification à Logstash, qui fera ensuite le tri pour ne traiter que ce qui touche aux échecs SSH.</p>
+<pre><code class="">$ cat /etc/rsyslog.d/logstash.conf
+auth.* @@127.0.0.1:10515</code></pre>
+<p>En français, ça donne : envoies tout ce qui parle d'authentification en TCP, en localhost, sur le port 10515.</p>
+
+          </section>
+          <section class="slide ">
+            <h2>Logstash</h2>
+
+<h3>Input</h3>
+<pre><code class="">input {
+    syslog {
+        host =&gt; &quot;127.0.0.1&quot;
+            port =&gt; 10515
+            type =&gt; &quot;auth&quot;
+    }
+}</code></pre>
+          </section>
+          <section class="slide ">
+            <h3>Filter</h3>
+<pre><code class="">filter {
+    if [type] == &quot;auth&quot; and [program] == &quot;sshd&quot; {
+        grok { match =&gt; {
+                &quot;message&quot; =&gt; &quot;Failed password for( invalid user)? %{DATA:user} from %{IP:ip} port %{INT:port:int} ssh2&quot;
+            }
+            add_tag =&gt; &quot;ssh_failed&quot;
+        }
+    }
+    if &quot;ssh_failed&quot; in [tags] {
+        geoip { source =&gt; &quot;ip&quot; }
+        dns { reverse =&gt; [&quot;ip&quot;] }
+    }
+}</code></pre>
+          </section>
+          <section class="slide ">
+            <h3>Output</h3>
+<pre><code class="">output {
+    if &quot;ssh_failed&quot; in [tags] {
+        elasticsearch_http {
+            host =&gt; &quot;localhost&quot;
+        }
+    }
+}</code></pre>
+          </section>
+          <section class="slide ">
+            <h2>Analyse</h2>
+
+<p>Le nombre de tentatives est-il important?</p>
+
+<p>D'où viennent les pénibles?</p>
+
+<p>Quel utilisateur est-il utilisé?</p>
+
+          </section>
+      </section>
+      <script src="js/prefixfree.min.js"></script>
+      <script src="js/slideshow.js"></script>
+    <script>slideshow = new SlideShow();</script>
+  </body>
+</html>
